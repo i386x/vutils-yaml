@@ -25,6 +25,7 @@ line_length = 79
 
 [tool.pylint.design]
 min-public-methods = 0
+max-parents = 9
 
 [tool.pylint.format]
 max-line-length = 79

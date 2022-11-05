@@ -17,7 +17,7 @@ from vutils.yaml.utils import YamlDataType, annotate_constructed_objects
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from vutils.yaml import _StreamType
+    from vutils.yaml import StreamType
 
 
 @annotate_constructed_objects(
@@ -57,7 +57,7 @@ class AnnotateLoader(
 
     __slots__ = ()
 
-    def __init__(self, stream: "_StreamType") -> None:
+    def __init__(self, stream: "StreamType") -> None:
         """
         Initialize the YAML loader.
 
@@ -71,7 +71,7 @@ class AnnotateLoader(
         yaml.resolver.Resolver.__init__(self)
 
 
-def load_yaml(stream: "_StreamType") -> YamlDataType:
+def load_yaml(stream: "StreamType") -> YamlDataType:
     """
     Load YAML from the stream.
 

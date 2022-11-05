@@ -20,17 +20,17 @@ PyList: TypeAlias = list[object]
 PySet: TypeAlias = set[object]
 PyDict: TypeAlias = dict[object, object]
 
-_MarkType: TypeAlias = yaml.error.Mark
-_NodeType: TypeAlias = yaml.nodes.Node
-_CtorType: TypeAlias = yaml.constructor.BaseConstructor
-_CtorSpecType: TypeAlias = tuple[str, str | None, bool]
-_CtorDecorType: TypeAlias = Callable[[type[_CtorType]], type[_CtorType]]
-_StreamType: TypeAlias = str | bytes | SupportsRead[str] | SupportsRead[bytes]
+MarkType: TypeAlias = yaml.error.Mark
+NodeType: TypeAlias = yaml.nodes.Node
+CtorType: TypeAlias = yaml.constructor.BaseConstructor
+CtorSpecType: TypeAlias = tuple[str, str | None, bool]
+CtorDecorType: TypeAlias = Callable[[type[CtorType]], type[CtorType]]
+StreamType: TypeAlias = str | bytes | SupportsRead[str] | SupportsRead[bytes]
 
-def _new_date(cls: type[_T], *args: object) -> _T: ...
-def _new_datetime(cls: type[_T], *args: object, **kwargs: object) -> _T: ...
+def new_date(cls: type[_T], *args: object) -> _T: ...
+def new_datetime(cls: type[_T], *args: object, **kwargs: object) -> _T: ...
 
-class _CtorFuncType(Protocol):
+class CtorFuncType(Protocol):
     def __call__(
-        self, inst: _CtorType, node: _NodeType, *args: object, **kwargs: object
+        self, inst: CtorType, node: NodeType, *args: object, **kwargs: object
     ) -> object: ...

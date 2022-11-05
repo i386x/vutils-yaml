@@ -19,24 +19,24 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from vutils.yaml import (
+        CtorDecorType,
+        CtorFuncType,
+        CtorSpecType,
+        CtorType,
+        MarkType,
+        NodeType,
         PyDict,
         PyList,
         PySet,
-        _CtorDecorType,
-        _CtorFuncType,
-        _CtorSpecType,
-        _CtorType,
-        _MarkType,
-        _new_date,
-        _new_datetime,
-        _NodeType,
+        new_date,
+        new_datetime,
     )
 else:
     PyList = list
     PySet = set
     PyDict = dict
-    _new_date = datetime.date.__new__
-    _new_datetime = datetime.datetime.__new__
+    new_date = datetime.date.__new__
+    new_datetime = datetime.datetime.__new__
 
 ANNOTATION_SLOT: str = "__yaml_annotation__"
 KEYLOC_SLOT: str = "__yaml_keyloc__"
@@ -217,7 +217,7 @@ class DateType(datetime.date, YamlDataType):
         if isinstance(args[0], datetime.date):
             date: datetime.date = args[0]
             return datetime.date.__new__(cls, date.year, date.month, date.day)
-        return _new_date(cls, *args)
+        return new_date(cls, *args)
 
 
 class DateTimeType(datetime.datetime, YamlDataType):
@@ -250,7 +250,7 @@ class DateTimeType(datetime.datetime, YamlDataType):
                 stamp.tzinfo,
                 fold=stamp.fold,
             )
-        return _new_datetime(cls, *args, **kwargs)
+        return new_datetime(cls, *args, **kwargs)
 
 
 TYPEMAP: "dict[object, type[YamlDataType]]" = {
@@ -303,7 +303,7 @@ def newc(name: str, args: "tuple[object, ...]") -> object:
     return []
 
 
-def annotate(data: object, node: "_NodeType") -> YamlDataType:
+def annotate(data: object, node: "NodeType") -> YamlDataType:
     """
     Annotate data with information from node.
 
@@ -312,7 +312,7 @@ def annotate(data: object, node: "_NodeType") -> YamlDataType:
     :return: the annotated data object
     :raises yaml.error.YAMLError: when operation fails
     """
-    mark: "_MarkType" = node.start_mark
+    mark: "MarkType" = node.start_mark
     name: str = mark.name
     line: int = mark.line + 1
     column: int = mark.column + 1
@@ -336,7 +336,7 @@ def annotate(data: object, node: "_NodeType") -> YamlDataType:
     return ydata
 
 
-def make_ctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
+def make_ctor(name: str, base_cls: "type[CtorType]") -> "CtorFuncType":
     """
     Create YAML object constructor (function).
 
@@ -346,7 +346,7 @@ def make_ctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
     """
 
     def ctor(
-        inst: "_CtorType", node: "_NodeType", *args: object, **kwargs: object
+        inst: "CtorType", node: "NodeType", *args: object, **kwargs: object
     ) -> object:
         """
         Construct an annotated YAML object.
@@ -357,8 +357,8 @@ def make_ctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
         :param kwargs: Additional keyword arguments
         :return: the annotated YAML object
         """
-        base_ctor: "_CtorFuncType" = cast(
-            "_CtorFuncType", getattr(base_cls, name)
+        base_ctor: "CtorFuncType" = cast(
+            "CtorFuncType", getattr(base_cls, name)
         )
         data: object = base_ctor(inst, node, *args, **kwargs)
         return annotate(data, node)
@@ -366,7 +366,7 @@ def make_ctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
     return ctor
 
 
-def make_gctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
+def make_gctor(name: str, base_cls: "type[CtorType]") -> "CtorFuncType":
     """
     Create YAML object constructor (generator).
 
@@ -376,7 +376,7 @@ def make_gctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
     """
 
     def gctor(
-        inst: "_CtorType", node: "_NodeType", *args: object, **kwargs: object
+        inst: "CtorType", node: "NodeType", *args: object, **kwargs: object
     ) -> Iterator[object]:
         """
         Generate an annotated YAML object.
@@ -389,8 +389,8 @@ def make_gctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
         """
         data: object = annotate(newc(name, args), node)
         yield data
-        base_ctor: "_CtorFuncType" = cast(
-            "_CtorFuncType", getattr(base_cls, name)
+        base_ctor: "CtorFuncType" = cast(
+            "CtorFuncType", getattr(base_cls, name)
         )
         generator: Iterator[object] = cast(
             Iterator[object], base_ctor(inst, node, *args, **kwargs)
@@ -403,7 +403,7 @@ def make_gctor(name: str, base_cls: "type[_CtorType]") -> "_CtorFuncType":
     return gctor
 
 
-def annotate_constructed_objects(*spec: "_CtorSpecType") -> "_CtorDecorType":
+def annotate_constructed_objects(*spec: "CtorSpecType") -> "CtorDecorType":
     """
     Annotate constructed YAML objects with their location.
 
@@ -415,7 +415,7 @@ def annotate_constructed_objects(*spec: "_CtorSpecType") -> "_CtorDecorType":
     :return: the decorator function that patches the class
     """
 
-    def patch_constructors(cls: "type[_CtorType]") -> "type[_CtorType]":
+    def patch_constructors(cls: "type[CtorType]") -> "type[CtorType]":
         """
         Patch YAML object constructors.
 
@@ -425,16 +425,16 @@ def annotate_constructed_objects(*spec: "_CtorSpecType") -> "_CtorDecorType":
         A decorator that patches YAML object constructors of the given class
         with the ability to annotate constructed objects with their location.
         """
-        base_cls: "type[_CtorType]" = cls.__bases__[0]
+        base_cls: "type[CtorType]" = cls.__bases__[0]
         for name, tag, is_gen in spec:
-            mfunc: "_CtorFuncType" = (
+            mfunc: "CtorFuncType" = (
                 make_gctor(name, base_cls)
                 if is_gen
                 else make_ctor(name, base_cls)
             )
             setattr(cls, name, mfunc)
             if tag is not None:
-                cast("dict[str, _CtorFuncType]", cls.yaml_constructors)[
+                cast("dict[str, CtorFuncType]", cls.yaml_constructors)[
                     tag
                 ] = mfunc
         return cls

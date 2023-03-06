@@ -12,7 +12,7 @@ import datetime
 from typing import TYPE_CHECKING, Iterator, cast
 
 import yaml
-from vutils.python.data import merge_data
+from vutils.python.objects import merge_data
 from vutils.validator.value import Location
 
 if TYPE_CHECKING:

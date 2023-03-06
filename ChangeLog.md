@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.2
+
+* Fix `safety` issues
+* Fix module name
+
 ## 0.1.1
 
 * Add requirements

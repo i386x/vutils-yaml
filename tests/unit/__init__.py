@@ -6,4 +6,4 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Unit tests for `vutils.yaml`."""
+"""Unit tests for :mod:`vutils.yaml`."""

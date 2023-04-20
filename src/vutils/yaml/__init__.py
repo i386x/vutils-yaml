@@ -6,4 +6,4 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""`vutils.yaml` package."""
+""":mod:`vutils.yaml` package."""

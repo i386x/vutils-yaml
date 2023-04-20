@@ -6,10 +6,16 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Miscellaneous utilities."""
+"""
+Miscellaneous utilities.
+
+:const ANNOTATION_SLOT: The name of the slot that holds an annotation
+:const KEYLOC_SLOT: The name of the slot that holds the location of a key
+:const TYPEMAP: The mapping between type and its annotation-friendly wrapper
+"""
 
 import datetime
-from typing import TYPE_CHECKING, Iterator, cast
+from typing import TYPE_CHECKING, cast
 
 import yaml
 from vutils.python.objects import merge_data
@@ -17,6 +23,7 @@ from vutils.validator.value import Location
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Iterator
 
     from vutils.yaml import (
         CtorDecorType,
@@ -43,8 +50,13 @@ KEYLOC_SLOT: str = "__yaml_keyloc__"
 
 
 class Annotation:
-    """Holds YAML values annotation."""
+    """
+    Holds YAML values annotation.
 
+    :ivar location: The value's location
+    """
+
+    location: Location
     __slots__ = ("location",)
 
     def __init__(self, location: "Location | None" = None) -> None:
@@ -66,26 +78,28 @@ class YamlDataType:
 
 class NullType(YamlDataType):
     """
-    A null (`None`) type.
+    A null (:obj:`None`) type.
 
-    Since `None` has a special meaning it cannot be annotated nor it is
+    Since :obj:`None` has a special meaning it cannot be annotated nor it is
     possible to inherit from its type. This workaround is used to store
     annotation alongside with ``null``.
     """
 
     def __bool__(self) -> bool:
         """
-        Convert `NullType` object to the `bool` object.
+        Convert :class:`.NullType` object to the :class:`bool` object.
 
-        :return: always `False`
+        :return: always :obj:`False`
         """
         return False
 
     def __eq__(self, other: object) -> bool:
         """
-        Test the equality of this and the other object.
+        Test the equality of this and the :arg:`other` object.
 
-        :return: `True` if this and the other object are considered equal
+        :param other: The other object
+        :return: :obj:`True` if this and the :arg:`other` object are considered
+            equal
         """
         return other is None or isinstance(other, type(self))
 
@@ -102,13 +116,15 @@ class BoolType(YamlDataType):
     """
     Represent a Boolean type.
 
-    Since `bool` is not an acceptable base class this workaround is used to
-    store annotation alongside with Boolean values.
+    Since :class:`bool` is not an acceptable base class this workaround is used
+    to store annotation alongside with Boolean values.
     """
+
+    __value: bool
 
     def __init__(self, value: bool) -> None:
         """
-        Initialize the `bool`-like object.
+        Initialize the :class:`bool`-like object.
 
         :param value: The value
         """
@@ -117,7 +133,7 @@ class BoolType(YamlDataType):
 
     def __bool__(self) -> bool:
         """
-        Convert this object to `bool` object.
+        Convert this object to :class:`bool` object.
 
         :return: the kept value
         """
@@ -125,9 +141,11 @@ class BoolType(YamlDataType):
 
     def __eq__(self, other: object) -> bool:
         """
-        Test the equality of this and the other object.
+        Test the equality of this and the :arg:`other` object.
 
-        :return: `True` if this and the other objects are considered equal
+        :param other: The other object
+        :return: :obj:`True` if this and the :arg:`other` object are considered
+            equal
         """
         if isinstance(other, (bool, BoolType)):
             return bool(self) is bool(other)
@@ -146,7 +164,7 @@ class BoolType(YamlDataType):
 
 class IntType(int, YamlDataType):
     """
-    Wrap the `int` type.
+    Wrap the :class:`int` type.
 
     Needed to store annotation.
     """
@@ -154,7 +172,7 @@ class IntType(int, YamlDataType):
 
 class FloatType(float, YamlDataType):
     """
-    Wrap the `float` type.
+    Wrap the :class:`float` type.
 
     Needed to store annotation.
     """
@@ -162,7 +180,7 @@ class FloatType(float, YamlDataType):
 
 class StrType(str, YamlDataType):
     """
-    Wrap the `str` type.
+    Wrap the :class:`str` type.
 
     Needed to store annotation.
     """
@@ -170,7 +188,7 @@ class StrType(str, YamlDataType):
 
 class BytesType(bytes, YamlDataType):
     """
-    Wrap the `bytes` type.
+    Wrap the :class:`bytes` type.
 
     Needed to store annotation.
     """
@@ -178,7 +196,7 @@ class BytesType(bytes, YamlDataType):
 
 class ListType(PyList, YamlDataType):
     """
-    Wrap the `list` type.
+    Wrap the :class:`list` type.
 
     Needed to store annotation.
     """
@@ -186,7 +204,7 @@ class ListType(PyList, YamlDataType):
 
 class SetType(PySet, YamlDataType):
     """
-    Wrap the `set` type.
+    Wrap the :class:`set` type.
 
     Needed to store annotation.
     """
@@ -194,7 +212,7 @@ class SetType(PySet, YamlDataType):
 
 class DictType(PyDict, YamlDataType):
     """
-    Wrap the `dict` type.
+    Wrap the :class:`dict` type.
 
     Needed to store annotation.
     """
@@ -202,7 +220,7 @@ class DictType(PyDict, YamlDataType):
 
 class DateType(datetime.date, YamlDataType):
     """
-    Wrap the `datetime.date` type.
+    Wrap the :class:`datetime.date` type.
 
     Needed to store annotation.
     """
@@ -211,7 +229,8 @@ class DateType(datetime.date, YamlDataType):
         """
         Create the date object.
 
-        :param args: Either `datetime.date` object or `datetime.date` arguments
+        :param args: Either :class:`datetime.date` object or
+            :class:`datetime.date`'s positional arguments
         :return: the date object
         """
         if isinstance(args[0], datetime.date):
@@ -222,7 +241,7 @@ class DateType(datetime.date, YamlDataType):
 
 class DateTimeType(datetime.datetime, YamlDataType):
     """
-    Wrap the `datetime.datetime` type.
+    Wrap the :class:`datetime.datetime` type.
 
     Needed to store annotation.
     """
@@ -231,9 +250,9 @@ class DateTimeType(datetime.datetime, YamlDataType):
         """
         Create the datetime object.
 
-        :param args: Either `datetime.datetime` object or `datetime.datetime`
-            arguments
-        :param kwargs: Key-word arguments to `datetime.datetime`
+        :param args: Either :class:`datetime.datetime` object or
+            :class:`datetime.datetime`'s positional arguments
+        :param kwargs: Key-value arguments to :class:`datetime.datetime`
         :return: the datetime object
         """
         if isinstance(args[0], datetime.datetime):
@@ -353,8 +372,8 @@ def make_ctor(name: str, base_cls: "type[CtorType]") -> "CtorFuncType":
 
         :param inst: The YAML constructor class instance
         :param node: The node
-        :param args: Additional arguments
-        :param kwargs: Additional keyword arguments
+        :param args: Additional positional arguments
+        :param kwargs: Additional key-value arguments
         :return: the annotated YAML object
         """
         base_ctor: "CtorFuncType" = cast(
@@ -377,14 +396,14 @@ def make_gctor(name: str, base_cls: "type[CtorType]") -> "CtorFuncType":
 
     def gctor(
         inst: "CtorType", node: "NodeType", *args: object, **kwargs: object
-    ) -> Iterator[object]:
+    ) -> "Iterator[object]":
         """
         Generate an annotated YAML object.
 
         :param inst: The YAML constructor class instance
         :param node: The node
-        :param args: Additional arguments
-        :param kwargs: Additional keyword arguments
+        :param args: Additional positional arguments
+        :param kwargs: Additional key-value arguments
         :return: the annotated YAML object
         """
         data: object = annotate(newc(name, args), node)
@@ -392,8 +411,8 @@ def make_gctor(name: str, base_cls: "type[CtorType]") -> "CtorFuncType":
         base_ctor: "CtorFuncType" = cast(
             "CtorFuncType", getattr(base_cls, name)
         )
-        generator: Iterator[object] = cast(
-            Iterator[object], base_ctor(inst, node, *args, **kwargs)
+        generator: "Iterator[object]" = cast(
+            "Iterator[object]", base_ctor(inst, node, *args, **kwargs)
         )
         gdata: object = {}
         for item in generator:
@@ -410,8 +429,8 @@ def annotate_constructed_objects(*spec: "CtorSpecType") -> "CtorDecorType":
     :param spec: Each argument is a triple holding constructor name, tag, and
         a Boolean value, respectively, saying whether the constructor is a
         generator or not. Constructor name specifies the constructor involved
-        in annotating YAML object during its construction, tag is a tag
-        associated with the constructor or `None`
+        in annotating a YAML object during its construction, tag is a tag
+        associated with the constructor or :obj:`None`
     :return: the decorator function that patches the class
     """
 
@@ -458,7 +477,7 @@ def keyloc(obj: DictType, kobj: object) -> Location:
     """
     Get the location of the key object.
 
-    :param obj: The annotated `dict` object
+    :param obj: The annotated :class:`dict` object
     :param kobj: The key
     :return: the location of the key
     """
@@ -477,7 +496,7 @@ def is_null(obj: YamlDataType) -> bool:
     Test whether the object is null.
 
     :param obj: The annotated object
-    :return: `True` if *obj* is null
+    :return: :obj:`True` if :arg:`obj` is null
     """
     return isinstance(obj, NullType)
 
@@ -487,6 +506,6 @@ def is_bool(obj: YamlDataType) -> bool:
     Test whether the object has Boolean type.
 
     :param obj: The annotated object
-    :return: `True` if *obj* has Boolean type
+    :return: :obj:`True` if :arg:`obj` has Boolean type
     """
     return isinstance(obj, BoolType)

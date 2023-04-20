@@ -76,6 +76,7 @@ def load_yaml(stream: "StreamType") -> YamlDataType:
     Load YAML from the stream.
 
     :param stream: The stream
+    :return: the YAML document object
     """
     loader: AnnotateLoader = AnnotateLoader(stream)
     try:

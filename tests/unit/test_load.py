@@ -6,7 +6,14 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Test `vutils.yaml.load` module."""
+"""
+Test :mod:`vutils.yaml.load` module.
+
+:const YAML_STREAM: The auxiliary YAML data stream
+:const YAML_STREAM_NAME: The name of the auxiliary YAML data stream
+
+.. |load_yaml| replace:: :func:`~vutils.yaml.load.load_yaml`
+"""
 
 from vutils.testing.testcase import TestCase
 
@@ -55,7 +62,7 @@ YAML_STREAM_NAME = "<unicode string>"
 
 
 class LoadYamlTestCase(TestCase):
-    """Test case for `load_yaml`."""
+    """Test case for |load_yaml|."""
 
     __slots__ = ()
 
@@ -78,7 +85,7 @@ class LoadYamlTestCase(TestCase):
         Check the data annotation.
 
         :param obj: The data object
-        :param klass: The data type class
+        :param klass: The expected type of the data object
         :param line: The expected line of the data location
         :param column: The expected column of the data location
         """

@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.4
+
+* Add missing dependency
+* Add missing instance variable documentation
+
 ## 0.1.3
 
 * Code cleanup

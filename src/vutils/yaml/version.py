@@ -12,4 +12,4 @@ Holds :mod:`vutils.yaml` version.
 :const __version__: The package version
 """
 
-__version__: str = "0.1.3"
+__version__: str = "0.1.4"

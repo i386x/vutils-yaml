@@ -57,6 +57,7 @@ class Annotation:
     """
 
     location: Location
+
     __slots__ = ("location",)
 
     def __init__(self, location: "Location | None" = None) -> None:
@@ -115,6 +116,8 @@ class NullType(YamlDataType):
 class BoolType(YamlDataType):
     """
     Represent a Boolean type.
+
+    :ivar __value: The truth value
 
     Since :class:`bool` is not an acceptable base class this workaround is used
     to store annotation alongside with Boolean values.
